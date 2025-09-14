@@ -1,10 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -19,37 +16,31 @@ import Attendance from "./pages/Attendance";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            
-            {/* Protected routes */}
-            <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/app/classes" element={<ProtectedRoute><Classes /></ProtectedRoute>} />
-            <Route path="/app/classes/:classname" element={<ProtectedRoute><ClassDetails /></ProtectedRoute>} />
-            <Route path="/app/classes/:classname/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
-            <Route path="/app/students/:reg_no" element={<ProtectedRoute><StudentDetails /></ProtectedRoute>} />
-            <Route path="/app/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-            <Route path="/app/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Landing />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        
+        {/* App routes */}
+        <Route path="/app" element={<Dashboard />} />
+        <Route path="/app/classes" element={<Classes />} />
+        <Route path="/app/classes/:classname" element={<ClassDetails />} />
+        <Route path="/app/classes/:classname/students" element={<Students />} />
+        <Route path="/app/students/:reg_no" element={<StudentDetails />} />
+        <Route path="/app/attendance" element={<Attendance />} />
+        <Route path="/app/profile" element={<Profile />} />
+        
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  </TooltipProvider>
 );
 
 export default App;
