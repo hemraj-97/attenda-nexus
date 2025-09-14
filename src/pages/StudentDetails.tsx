@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { ArrowLeft, User, Calendar, Phone, Users } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { mockStudents, mockAttendance } from '../mocks/data';
+import { Student, Attendance } from '../types';
 
 export default function StudentDetails() {
   const { reg_no } = useParams<{ reg_no: string }>();

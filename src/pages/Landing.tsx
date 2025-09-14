@@ -45,7 +45,7 @@ const stats = [
 ];
 
 export default function Landing() {
-  const { isAuthenticated } = useAuth();
+  
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Parallax mouse effect

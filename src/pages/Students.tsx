@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { Student } from '../types';
+import { mockStudents, generateId, generateRegNo } from '../mocks/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 
 export default function Students() {

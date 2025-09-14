@@ -8,6 +8,7 @@ import { Label } from '../components/ui/label';
 import { Badge } from '../components/ui/badge';
 import { ClipboardCheck, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
 import { mockClasses, mockStudents, mockAttendance } from '../mocks/data';
+import { useToast } from '../hooks/use-toast';
 import { Class, Student, AttendanceRecord } from '../types';
 
 export default function Attendance() {
