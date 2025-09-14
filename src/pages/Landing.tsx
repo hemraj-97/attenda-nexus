@@ -48,11 +48,6 @@ export default function Landing() {
   const { isAuthenticated } = useAuth();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
-  }
-
   // Parallax mouse effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -62,6 +57,11 @@ export default function Landing() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
