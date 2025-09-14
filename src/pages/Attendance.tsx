@@ -7,15 +7,10 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Badge } from '../components/ui/badge';
 import { ClipboardCheck, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '../hooks/use-toast';
-import { classService } from '../services/classes';
-import { studentService } from '../services/students';
-import { attendanceService } from '../services/attendance';
+import { mockClasses, mockStudents, mockAttendance } from '../mocks/data';
 import { Class, Student, AttendanceRecord } from '../types';
 
 export default function Attendance() {
-  const { teacher } = useAuth();
   const { toast } = useToast();
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>('');
@@ -26,10 +21,8 @@ export default function Attendance() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (teacher) {
-      fetchClasses();
-    }
-  }, [teacher]);
+    fetchClasses();
+  }, []);
 
   useEffect(() => {
     if (selectedClass) {
@@ -37,29 +30,19 @@ export default function Attendance() {
     }
   }, [selectedClass, selectedDate]);
 
-  const fetchClasses = async () => {
-    if (!teacher) return;
-    try {
-      const classesData = await classService.getClasses(teacher.id);
-      setClasses(classesData);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch classes',
-        variant: 'destructive'
-      });
-    }
+  const fetchClasses = () => {
+    setClasses(mockClasses);
   };
 
-  const fetchStudentsAndAttendance = async () => {
+  const fetchStudentsAndAttendance = () => {
     if (!selectedClass) return;
     
     try {
       setLoading(true);
-      const studentsData = await studentService.getStudentsByClass(selectedClass);
+      const studentsData = mockStudents.filter(s => s.classname === selectedClass);
       setStudents(studentsData);
       
-      const existingAttendance = await attendanceService.getAttendanceByClassAndDate(selectedClass, selectedDate);
+      const existingAttendance = mockAttendance.filter(a => a.class_name === selectedClass && a.date === selectedDate);
       
       const records: AttendanceRecord[] = studentsData.map(student => {
         const existing = existingAttendance.find(a => a.reg_no === student.reg_no);
@@ -70,12 +53,6 @@ export default function Attendance() {
       });
       
       setAttendanceRecords(records);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch attendance data',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -91,27 +68,15 @@ export default function Attendance() {
 
   const saveAttendance = async () => {
     if (!selectedClass || attendanceRecords.length === 0) return;
-    
     try {
       setSaving(true);
-      await attendanceService.markAttendance({
-        className: selectedClass,
-        date: selectedDate,
-        records: attendanceRecords
-      });
-      
-      toast({
-        title: 'Success',
-        description: 'Attendance saved successfully'
-      });
+      setTimeout(() => {
+        setSaving(false);
+        toast({ title: 'Success', description: 'Attendance saved successfully' });
+      }, 400);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to save attendance',
-        variant: 'destructive'
-      });
-    } finally {
       setSaving(false);
+      toast({ title: 'Error', description: 'Failed to save attendance', variant: 'destructive' });
     }
   };
 

@@ -15,9 +15,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import { classService } from '../services/classes';
-import { studentService } from '../services/students';
-import { attendanceService } from '../services/attendance';
+import { mockClasses, mockStudents, mockAttendance } from '../mocks/data';
 import { Class, Student } from '../types';
 
 export default function ClassDetails() {
@@ -38,39 +36,21 @@ export default function ClassDetails() {
     }
   }, [classname]);
 
-  const fetchClassData = async () => {
+  const fetchClassData = () => {
     if (!classname) return;
     
     try {
       setLoading(true);
-      
       const decodedClassName = decodeURIComponent(classname);
-      
-      // Fetch class data
-      const cls = await classService.getClassByName(decodedClassName);
-      if (!cls) {
-        toast({
-          title: 'Error',
-          description: 'Class not found',
-          variant: 'destructive'
-        });
-        return;
-      }
+      const cls = mockClasses.find(c => c.classname === decodedClassName) || null;
       setClassData(cls);
-      
-      // Fetch students
-      const studentsData = await studentService.getStudentsByClass(decodedClassName);
+      const studentsData = mockStudents.filter(s => s.classname === decodedClassName);
       setStudents(studentsData);
-      
-      // Fetch attendance stats
-      const stats = await attendanceService.getAttendanceStats(decodedClassName);
-      setAttendanceStats(stats);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch class details',
-        variant: 'destructive'
-      });
+      const classRecords = mockAttendance.filter(a => a.class_name === decodedClassName);
+      const totalDays = Array.from(new Set(classRecords.map(a => a.date))).length;
+      const presentCount = classRecords.filter(a => a.status === 'PRESENT').length;
+      const attendanceRate = classRecords.length ? (presentCount / classRecords.length) * 100 : 0;
+      setAttendanceStats({ totalDays, attendanceRate });
     } finally {
       setLoading(false);
     }

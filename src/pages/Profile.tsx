@@ -6,14 +6,15 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { User, Edit, Mail, Shield } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { mockTeacher } from '../mocks/data';
 import { useToast } from '../hooks/use-toast';
 
 export default function Profile() {
-  const { teacher, updateProfile, signOut, loading } = useAuth();
+  const [name, setName] = useState(mockTeacher.name);
+  const email = mockTeacher.email;
   const { toast } = useToast();
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editName, setEditName] = useState(teacher?.name || '');
+  const [editName, setEditName] = useState(name);
   const [updating, setUpdating] = useState(false);
 
   const handleUpdateProfile = async () => {
@@ -25,32 +26,14 @@ export default function Profile() {
       });
       return;
     }
-
-    try {
-      setUpdating(true);
-      await updateProfile({ name: editName.trim() });
-      setShowEditDialog(false);
-      toast({
-        title: 'Success',
-        description: 'Profile updated successfully'
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update profile',
-        variant: 'destructive'
-      });
-    } finally {
-      setUpdating(false);
-    }
+    setName(editName.trim());
+    setShowEditDialog(false);
+    toast({ title: 'Success', description: 'Profile updated successfully' });
   };
 
   const handleSignOut = () => {
-    signOut();
-    toast({
-      title: 'Signed Out',
-      description: 'You have been signed out successfully'
-    });
+    window.location.href = '/signin';
+    toast({ title: 'Signed Out', description: 'You have been signed out successfully' });
   };
 
   return (
@@ -80,22 +63,22 @@ export default function Profile() {
             <div className="flex items-center space-x-6 mb-6">
               <div className="h-20 w-20 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-2xl">
-                  {teacher?.name?.charAt(0).toUpperCase() || 'T'}
+                  {name?.charAt(0).toUpperCase() || 'T'}
                 </span>
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-foreground mb-1">
-                  {teacher?.name || 'Teacher'}
+                  {name || 'Teacher'}
                 </h3>
                 <p className="text-foreground-muted flex items-center space-x-1">
                   <Mail className="h-4 w-4" />
-                  <span>{teacher?.email || 'teacher@school.edu'}</span>
+                  <span>{email}</span>
                 </p>
               </div>
               
               <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" onClick={() => setEditName(teacher?.name || '')}>
+                  <Button variant="outline" onClick={() => setEditName(name)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
@@ -122,7 +105,7 @@ export default function Profile() {
                       <Label htmlFor="email">Email Address</Label>
                       <Input
                         id="email"
-                        value={teacher?.email || ''}
+                        value={email}
                         disabled
                         className="glass opacity-50"
                       />

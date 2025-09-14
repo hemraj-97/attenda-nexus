@@ -6,9 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { ArrowLeft, User, Calendar, Phone, Users } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import { studentService } from '../services/students';
-import { attendanceService } from '../services/attendance';
-import { Student, Attendance } from '../types';
+import { mockStudents, mockAttendance } from '../mocks/data';
 
 export default function StudentDetails() {
   const { reg_no } = useParams<{ reg_no: string }>();
@@ -23,32 +21,18 @@ export default function StudentDetails() {
     }
   }, [reg_no]);
 
-  const fetchStudentData = async () => {
+  const fetchStudentData = () => {
     if (!reg_no) return;
     
     try {
       setLoading(true);
       const decodedRegNo = decodeURIComponent(reg_no);
       
-      const studentData = await studentService.getStudentByRegNo(decodedRegNo);
-      if (!studentData) {
-        toast({
-          title: 'Error',
-          description: 'Student not found',
-          variant: 'destructive'
-        });
-        return;
-      }
+      const studentData = mockStudents.find(s => s.reg_no === decodedRegNo) || null;
       setStudent(studentData);
       
-      const attendance = await attendanceService.getStudentAttendanceHistory(decodedRegNo);
+      const attendance = mockAttendance.filter(a => a.reg_no === decodedRegNo);
       setAttendanceHistory(attendance);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch student details',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

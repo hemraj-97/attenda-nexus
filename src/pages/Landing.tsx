@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
+
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { 
@@ -58,10 +58,6 @@ export default function Landing() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
-  }
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">

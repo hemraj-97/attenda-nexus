@@ -19,15 +19,13 @@ import {
   Eye,
   GraduationCap
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
-import { classService } from '../services/classes';
-import { studentService } from '../services/students';
 import { Class } from '../types';
+import { mockClasses, mockStudents, mockTeacher, generateId } from '../mocks/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 
 export default function Classes() {
-  const { teacher } = useAuth();
+  
   const { toast } = useToast();
   
   const [classes, setClasses] = useState<Class[]>([]);
@@ -44,41 +42,28 @@ export default function Classes() {
 
   useEffect(() => {
     fetchClasses();
-  }, [teacher]);
+  }, []);
 
-  const fetchClasses = async () => {
-    if (!teacher) return;
-    
-    try {
-      setLoading(true);
-      const classesData = await classService.getClasses(teacher.id);
-      setClasses(classesData);
-      
-      // Fetch student counts for each class
-      const counts: Record<string, number> = {};
-      for (const cls of classesData) {
-        const students = await studentService.getStudentsByClass(cls.classname);
-        counts[cls.classname] = students.length;
-      }
-      setStudentCounts(counts);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch classes',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
+  const fetchClasses = () => {
+    setLoading(true);
+    const classesData = [...mockClasses];
+    setClasses(classesData);
+    const counts: Record<string, number> = {};
+    for (const cls of classesData) {
+      counts[cls.classname] = mockStudents.filter(s => s.classname === cls.classname).length;
     }
+    setStudentCounts(counts);
+    setLoading(false);
   };
 
   const handleCreateClass = async () => {
-    if (!teacher || !newClassName.trim()) return;
+    if (!newClassName.trim()) return;
     
     try {
       setActionLoading(true);
-      await classService.createClass(newClassName.trim(), teacher.id);
-      await fetchClasses();
+      const newCls: Class = { id: generateId('class'), classname: newClassName.trim(), teacherId: mockTeacher.id };
+      setClasses(prev => [...prev, newCls]);
+      setStudentCounts(prev => ({ ...prev, [newCls.classname]: 0 }));
       setNewClassName('');
       setShowCreateDialog(false);
       toast({
@@ -88,7 +73,7 @@ export default function Classes() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create class',
+        description: 'Failed to create class',
         variant: 'destructive'
       });
     } finally {
@@ -101,8 +86,7 @@ export default function Classes() {
     
     try {
       setActionLoading(true);
-      await classService.updateClass(selectedClass.id, { classname: renameValue.trim() });
-      await fetchClasses();
+      setClasses(prev => prev.map(c => c.id === selectedClass.id ? { ...c, classname: renameValue.trim() } : c));
       setShowRenameDialog(false);
       setRenameValue('');
       setSelectedClass(null);
@@ -113,7 +97,7 @@ export default function Classes() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to rename class',
+        description: 'Failed to rename class',
         variant: 'destructive'
       });
     } finally {
@@ -126,8 +110,7 @@ export default function Classes() {
     
     try {
       setActionLoading(true);
-      await classService.deleteClass(selectedClass.id);
-      await fetchClasses();
+      setClasses(prev => prev.filter(c => c.id !== selectedClass.id));
       setShowDeleteDialog(false);
       setSelectedClass(null);
       toast({
@@ -137,7 +120,7 @@ export default function Classes() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete class',
+        description: 'Failed to delete class',
         variant: 'destructive'
       });
     } finally {

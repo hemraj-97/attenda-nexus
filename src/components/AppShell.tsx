@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation, NavLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { mockTeacher } from '../mocks/data';
 import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
@@ -21,7 +21,8 @@ const navigation = [
 ];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { teacher, signOut } = useAuth();
+  const teacher = mockTeacher;
+  const signOut = () => { window.location.href = '/signin'; };
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 

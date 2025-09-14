@@ -15,11 +15,7 @@ import {
   Clock,
   Activity
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { mockRecentActivity } from '../mocks/data';
-import { classService } from '../services/classes';
-import { studentService } from '../services/students';
-import { attendanceService } from '../services/attendance';
+import { mockTeacher, mockClasses, mockStudents, mockRecentActivity } from '../mocks/data';
 
 interface DashboardStats {
   totalClasses: number;
@@ -29,43 +25,24 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { teacher } = useAuth();
+  const teacher = mockTeacher;
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentActivity] = useState(mockRecentActivity);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!teacher) return;
-      
-      try {
-        setLoading(true);
-        
-        // Fetch classes
-        const classes = await classService.getClasses(teacher.id);
-        
-        // Fetch all students
-        const students = await studentService.getAllStudents();
-        
-        // Calculate today's attendance progress (mock calculation)
-        const todayProgress = Math.floor(Math.random() * 40) + 60; // 60-100%
-        const weeklyRate = Math.floor(Math.random() * 20) + 75; // 75-95%
-        
-        setStats({
-          totalClasses: classes.length,
-          totalStudents: students.length,
-          todayAttendanceProgress: todayProgress,
-          weeklyAttendanceRate: weeklyRate
-        });
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, [teacher]);
+    setLoading(true);
+    const t = setTimeout(() => {
+      setStats({
+        totalClasses: mockClasses.length,
+        totalStudents: mockStudents.length,
+        todayAttendanceProgress: Math.floor(Math.random() * 40) + 60,
+        weeklyAttendanceRate: Math.floor(Math.random() * 20) + 75,
+      });
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(t);
+  }, []);
 
   const quickActions = [
     {

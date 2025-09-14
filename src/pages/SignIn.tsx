@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -9,9 +9,9 @@ import { GraduationCap, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 export default function SignIn() {
-  const { isAuthenticated, signIn, loading } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const location = useLocation();
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -19,11 +19,6 @@ export default function SignIn() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/app';
-    return <Navigate to={from} replace />;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +33,17 @@ export default function SignIn() {
     }
 
     try {
-      await signIn(formData.email, formData.password);
-      toast({
-        title: 'Welcome back!',
-        description: 'Successfully signed in to your account'
-      });
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        toast({
+          title: 'Welcome back!',
+          description: 'Signed in (demo mode)'
+        });
+        navigate('/app');
+      }, 500);
     } catch (error) {
+      setLoading(false);
       toast({
         title: 'Sign In Failed',
         description: error instanceof Error ? error.message : 'An error occurred',

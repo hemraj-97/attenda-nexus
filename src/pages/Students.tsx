@@ -22,7 +22,6 @@ import {
   Eye
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import { studentService, CreateStudentData } from '../services/students';
 import { Student } from '../types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 
@@ -39,7 +38,15 @@ export default function Students() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   
-  const [formData, setFormData] = useState<CreateStudentData>({
+  const [formData, setFormData] = useState<{ 
+    name: string;
+    rollNumber: string;
+    classname: string;
+    dateOfBirth: string;
+    gender: 'Male' | 'Female' | 'Other';
+    guardianName: string;
+    guardianContact: string;
+  }>({
     name: '',
     rollNumber: '',
     classname: '',
@@ -59,18 +66,11 @@ export default function Students() {
 
   const fetchStudents = async () => {
     if (!classname) return;
-    
     try {
       setLoading(true);
       const decodedClassName = decodeURIComponent(classname);
-      const studentsData = await studentService.getStudentsByClass(decodedClassName);
+      const studentsData = mockStudents.filter(s => s.classname === decodedClassName);
       setStudents(studentsData);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch students',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -78,23 +78,24 @@ export default function Students() {
 
   const handleAddStudent = async () => {
     if (!validateForm()) return;
-    
     try {
       setActionLoading(true);
-      await studentService.createStudent(formData);
-      await fetchStudents();
+      const decodedClassName = classname ? decodeURIComponent(classname) : '';
+      const newStudent: Student = {
+        id: generateId('student'),
+        name: formData.name.trim(),
+        reg_no: generateRegNo(decodedClassName || formData.classname),
+        rollNumber: formData.rollNumber.trim(),
+        classname: decodedClassName || formData.classname,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        guardianName: formData.guardianName,
+        guardianContact: formData.guardianContact,
+      };
+      setStudents(prev => [newStudent, ...prev]);
       resetForm();
       setShowAddDialog(false);
-      toast({
-        title: 'Success',
-        description: `Student "${formData.name}" added successfully`
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to add student',
-        variant: 'destructive'
-      });
+      toast({ title: 'Success', description: `Student "${newStudent.name}" added successfully` });
     } finally {
       setActionLoading(false);
     }
@@ -102,23 +103,12 @@ export default function Students() {
 
   const handleDeleteStudent = async () => {
     if (!selectedStudent) return;
-    
     try {
       setActionLoading(true);
-      await studentService.deleteStudent(selectedStudent.id);
-      await fetchStudents();
+      setStudents(prev => prev.filter(s => s.id !== selectedStudent.id));
       setShowDeleteDialog(false);
       setSelectedStudent(null);
-      toast({
-        title: 'Success',
-        description: 'Student deleted successfully'
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete student',
-        variant: 'destructive'
-      });
+      toast({ title: 'Success', description: 'Student deleted successfully' });
     } finally {
       setActionLoading(false);
     }
@@ -167,7 +157,7 @@ export default function Students() {
     });
   };
 
-  const handleFormChange = (field: keyof CreateStudentData, value: string) => {
+  const handleFormChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

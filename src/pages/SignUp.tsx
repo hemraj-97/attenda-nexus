@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -9,8 +9,9 @@ import { GraduationCap, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { useToast } from '../hooks/use-toast';
 
 export default function SignUp() {
-  const { isAuthenticated, signUp, loading } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -21,10 +22,6 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
-  }
 
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -72,13 +69,18 @@ export default function SignUp() {
     if (!validateForm()) return;
 
     try {
-      await signUp(formData.name, formData.email, formData.password);
-      toast({
-        title: 'Account Created!',
-        description: 'Welcome to AttendanceAI. Your account has been created successfully.',
-        duration: 5000
-      });
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        toast({
+          title: 'Account Created!',
+          description: 'Welcome to AttendanceAI. Your account has been created successfully.',
+          duration: 5000
+        });
+        navigate('/app');
+      }, 600);
     } catch (error) {
+      setLoading(false);
       toast({
         title: 'Sign Up Failed',
         description: error instanceof Error ? error.message : 'An error occurred',
