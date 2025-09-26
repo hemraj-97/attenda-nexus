@@ -1,7 +1,14 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
+
+const actionTypes = {
+  ADD_TOAST: "ADD_TOAST",
+  UPDATE_TOAST: "UPDATE_TOAST",
+  DISMISS_TOAST: "DISMISS_TOAST",
+  REMOVE_TOAST: "REMOVE_TOAST",
+};
 
 let count = 0;
 
@@ -28,7 +35,7 @@ const addToRemoveQueue = (toastId) => {
   toastTimeouts.set(toastId, timeout);
 };
 
-const reducer = (state, action) => {
+export const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_TOAST":
       return {
@@ -39,16 +46,12 @@ const reducer = (state, action) => {
     case "UPDATE_TOAST":
       return {
         ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
-        ),
+        toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
       };
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId);
       } else {
@@ -65,7 +68,7 @@ const reducer = (state, action) => {
                 ...t,
                 open: false,
               }
-            : t
+            : t,
         ),
       };
     }
@@ -124,9 +127,9 @@ function toast({ ...props }) {
 }
 
 function useToast() {
-  const [state, setState] = useState(memoryState);
+  const [state, setState] = React.useState(memoryState);
 
-  useEffect(() => {
+  React.useEffect(() => {
     listeners.push(setState);
     return () => {
       const index = listeners.indexOf(setState);

@@ -1,10 +1,10 @@
 # Smart Attendance System - Frontend Report
 
 ## Overview
-A modern, dark-themed React + TypeScript frontend application for managing student attendance with a futuristic, neon-accented UI design.
+A modern, dark-themed React + JavaScript frontend application for managing student attendance with a futuristic, neon-accented UI design.
 
 ## Tech Stack
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 18 with JavaScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS with custom design system
 - **UI Components**: Radix UI primitives with custom styling
@@ -148,7 +148,7 @@ A modern, dark-themed React + TypeScript frontend application for managing stude
 - **CSS Optimization**: Tailwind purging for smaller stylesheets
 
 ## Development Practices
-- **TypeScript**: Full type safety throughout application
+- **JavaScript**: Modern ES6+ syntax with clean, maintainable code
 - **Component Reusability**: DRY principles with reusable components
 - **Consistent Styling**: Design system tokens and utilities
 - **Error Handling**: Graceful error states and user feedback
