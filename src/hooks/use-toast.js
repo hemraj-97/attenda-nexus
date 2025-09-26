@@ -1,5 +1,8 @@
 import * as React from "react";
 
+console.log("React object in use-toast:", React);
+console.log("React.useState:", React?.useState);
+
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
