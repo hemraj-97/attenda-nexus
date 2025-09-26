@@ -20,13 +20,13 @@ const navigation = [
   { name: 'Profile', href: '/app/profile', icon: User },
 ];
 
-export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppShell = ({ children }) => {
   const teacher = mockTeacher;
   const signOut = () => { window.location.href = '/signin'; };
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const isActive = (path: string) => {
+  const isActive = (path) => {
     if (path === '/app') {
       return location.pathname === '/app';
     }
